@@ -17,8 +17,20 @@
 <div data-quiet-version="1" data-quiet-block="image" data-quiet-align="center" style="text-align:center" data-quiet-source-kind="src" data-quiet-caption="FIGURE 1.1 说明"><figure><img src="../../../assets/x.jpg" alt="FIGURE 1.1 说明"></figure></div>
 ```
 
-- 子图、示意图、无图注的小图保留普通 `![](...)` 即可，不必硬造图注。
-- 图片居中、宽度、裁剪只能通过块 JSON（`doc patch` 的 `insert`/`replace-block`）写入，纯 Markdown 表达不了。
+- 子图、示意图、无图注的小图也要写成**同一个富图片块**，只是不带 `data-quiet-caption`：
+
+```html
+<div data-quiet-version="1" data-quiet-block="image" data-quiet-align="center" style="text-align:center" data-quiet-source-kind="src"><figure><img src="../../../assets/x.jpg" alt=""></figure></div>
+```
+
+  只写 `![](path)` 的图片会按普通正文左对齐，和带图注的居中图混在一起会一左一右，尽量全库统一。
+- 多子图（(a)(b)(c)… 各自一张图）时，图注挂到**最近的一张子图**上即可；子图之间允许隔着 `(a)`/`(b)` 这类短标签，导入脚本应按“最近的前一张图”挂载。
+- 图注挂上后，紧跟其后的孤立子图标签（`(d)` 独占一行）要一并删掉，否则会在图注下面多出一行 `(d)`。
+- 图片居中、宽度、裁剪写进富块的 `data-quiet-align` / 属性；纯 Markdown 表达不了。
+
+## 公式
+
+- 一个公式块只能有一个 `\tag{…}`。`\tag{1}\tag{1.75}` 这类双标签会让解析器整块报“无效公式”，导入前扫描一遍：同一 `$$` 块里出现两个 `\tag` 的，只保留最终编号。
 
 ## 表格
 
