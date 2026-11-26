@@ -3,12 +3,18 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 
 # Running this check must not create __pycache__ inside the shared toolbox.
 sys.dont_write_bytecode = True
 from check_update import REPO, VERSION_FILE, parse_version, remote_version
+
+
+def _same_path(a: str, b: str) -> bool:
+    """Compare filesystem paths cross-platform (separators, case, trailing slash)."""
+    return os.path.normcase(os.path.realpath(a)) == os.path.normcase(os.path.realpath(b))
 
 
 def git_state_error(local: str) -> str:
@@ -25,7 +31,7 @@ def git_state_error(local: str) -> str:
         return result.stdout.strip()
 
     try:
-        if git("rev-parse", "--show-toplevel") != str(root):
+        if not _same_path(git("rev-parse", "--show-toplevel"), str(root)):
             return "not-independent-repository"
         allowed_urls = {
             f"https://github.com/{REPO}",
